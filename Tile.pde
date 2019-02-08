@@ -46,12 +46,13 @@ class Tile{
     if(showEnergy){
       if(brightness(landColor) >= 0.7){
         fill(0,0,0,1);
-      }else{
+      }
+      else{
         fill(0,0,1,1);
       }
       textAlign(CENTER);
-      textFont(font,8);
-      text(nf((float)(100*foodLevel),0,2)+" Yums",(posX+0.5)*scaleUp,(posY+0.3)*scaleUp);
+      textFont(font,6);
+      text(nf((float)(100*foodLevel),0,2)+" Energy",(posX+0.5)*scaleUp,(posY+0.3)*scaleUp);
       text("Climate: "+nf((float)(climateType),0,2),(posX+0.5)*scaleUp,(posY+0.6)*scaleUp);
       text("Food: "+nf((float)(foodType),0,2),(posX+0.5)*scaleUp,(posY+0.9)*scaleUp);
     }
@@ -62,14 +63,16 @@ class Tile{
       double growthChange = board.getGrowthOverTimeRange(lastUpdateTime,updateTime);
       if(fertility > 1){
         foodLevel = 0;
-      }else{
+      }
+      else{
         if(growthChange > 0){
           if(foodLevel < maxGrowthLevel){
             double newDistToMax = (maxGrowthLevel-foodLevel)*Math.pow(2.71828182846,-growthChange*fertility*foodGrowthRate);
             double foodGrowthAmount = (maxGrowthLevel-newDistToMax)-foodLevel;
             addFood(foodGrowthAmount,false);
           }
-        }else{
+        }
+        else{
           removeFood(foodLevel-foodLevel*Math.pow(2.71828182846,growthChange*foodGrowthRate),false);
         }
         /*if(growableTime > 0){
@@ -77,7 +80,8 @@ class Tile{
             double foodGrowthAmount = (maxGrowthLevel-foodLevel)*fertility*foodGrowthRate*timeStep*growableTime;
             addFood(foodGrowthAmount,climateType);
           }
-        }else{
+        }
+        else{
           foodLevel += maxGrowthLevel*foodLevel*foodGrowthRate*timeStep*growableTime;
         }*/
       }
@@ -102,9 +106,11 @@ class Tile{
     color foodColor = color((float)(foodType),1,1);
     if(fertility > 1){
       return waterColor;
-    }else if(foodLevel < maxGrowthLevel){
+    }
+    else if(foodLevel < maxGrowthLevel){
       return interColorFixedHue(interColor(barrenColor,fertileColor,fertility),foodColor,foodLevel/maxGrowthLevel,hue(foodColor));
-    }else{
+    }
+    else{
       return interColorFixedHue(foodColor,blackColor,1.0-maxGrowthLevel/foodLevel,hue(foodColor));
     }
   }

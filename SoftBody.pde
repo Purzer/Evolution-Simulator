@@ -132,7 +132,8 @@ class SoftBody{
   public double getRadius(){
     if(energy <= 0){
       return 0;
-    }else{
+    }
+    else{
       return Math.sqrt(energy/energyDensity/Math.PI);
     }
   }

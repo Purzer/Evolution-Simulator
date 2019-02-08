@@ -1,9 +1,9 @@
 Board evoBoard;
 
-final int seed = 102983329;
-final float noiseStepSize = 0.05;
-final int boardWidth = 200;
-final int boardHeight = 200;
+final int seed = 1101010;
+final float noiseStepSize = 0.1;
+final int boardWidth = 100;
+final int boardHeight = 100;
 
 final int windowWidth = 1366;
 final int windowHeight = 786;
@@ -16,7 +16,7 @@ final float maxTemp = 1.0;
 
 final int numberOfRocks = 0;
 final int creatureMin = 100;
-final int creatureMax = 2500;
+final int creatureMax = 1000;
 
 boolean showAxons = false;
 float cameraX = boardWidth*0.5;
@@ -32,8 +32,7 @@ final String fileName = "Pics";
 
 void setup() {
   colorMode(HSB,1.0);
-  font = loadFont("Jygquip1-48.vlw");
-  //font = createFont("helvetica", 1.0);
+  font = loadFont("Font.vlw");
   size(1366,786); //windowWidth, windowHeight
   evoBoard = new Board(boardWidth, boardHeight, noiseStepSize, minTemp, maxTemp, 
   numberOfRocks, creatureMin, creatureMax, seed, fileName, timeStep);
@@ -60,11 +59,12 @@ void draw() {
       dragging = 2;
     }
   }
-  if (evoBoard.userControl && evoBoard.selectedCreature != null) {
+  if (evoBoard.selectedCreature != null) {
     cameraX = (float)evoBoard.selectedCreature.px;
     cameraY = (float)evoBoard.selectedCreature.py;
     cameraR = -PI/2.0-(float)evoBoard.selectedCreature.rotation;
-  }else{
+  }
+  else{
     cameraR = 0;
   }
   pushMatrix();
@@ -72,7 +72,7 @@ void draw() {
   evoBoard.drawBlankBoard(scale);
   translate(boardWidth*0.5*scale, boardHeight*0.5*scale);
   scale(zoom);
-  if (evoBoard.userControl && evoBoard.selectedCreature != null) {
+  if (evoBoard.selectedCreature != null) {
     rotate(cameraR);
   }
   translate(-cameraX*scale, -cameraY*scale);
@@ -119,10 +119,10 @@ void mousePressed() {
         int mX = (int)(x/230);
         int mY = (int)(y/50);
         int buttonNum = mX+mY*2;
-        if (buttonNum == 0) {
-          evoBoard.userControl = !evoBoard.userControl;
-        }
-        else if (buttonNum == 1) {
+        //if (buttonNum == 0) {
+        //  evoBoard.userControl = !evoBoard.userControl;
+        //}
+        if (buttonNum == 1) {
           if (clickedOnLeft) {
             evoBoard.creatureMinimum -= evoBoard.creatureMinimumIncrement;
           } 
@@ -195,8 +195,11 @@ void mousePressed() {
         zoom = 16;
       }
     }
-    if(1110 <= mouseX && mouseX <= 1210 && 15 <= mouseY && mouseY <= 45){
+    else if(1110 <= mouseX && mouseX <= 1210 && 15 <= mouseY && mouseY <= 45){
        showAxons = !showAxons;
+    }
+    else if(1185 <= mouseX && mouseX <= 1285 && 450 <= mouseY && mouseY <= 490){
+      evoBoard.selectedCreature.userControl = !evoBoard.selectedCreature.userControl;  
     }
     if (mouseX >= width-50){
       float toClickTemp = (mouseY-30)/530.0;

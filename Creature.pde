@@ -13,6 +13,7 @@ class Creature extends SoftBody{
   String parents;
   int gen;
   int id;
+  boolean userControl = false;
   double visionDistance = 10;
   double currentEnergy;
   double previousBirthTime;
@@ -30,6 +31,7 @@ class Creature extends SoftBody{
   
   double vr = 0;
   double rotation = 0;
+  final int genXP = 3;
   final int brainWidth = 10;
   final int brainHeight = 13;
   final double axonMutability = 0.0005;
@@ -63,45 +65,19 @@ class Creature extends SoftBody{
     if(tbrain == null){
       axons = new Axon[brainWidth-1][brainHeight][brainHeight*brainWidth];
       neurons = new double[brainWidth][brainHeight];
-      int nLevel = tgen/5;
-      if (nLevel >= 117)
-        nLevel = 117;
-      for(int i = 0; i < 13; i++){
-        int x;
-        int y;
-        if(i < 13){
-          x = 0;
-          y = i;
-          for(int z = 0; z < 13+nLevel; z++){
-            axons[x][y][z] = new Axon((Math.random()*2-1)*axonVaribility,axonMutability);
-          }
+      for(int y = 0; y < 13; y++){
+        for(int z = 0; z < 13; z++){
+          axons[0][y][z] = new Axon((Math.random()*2-1)*axonVaribility,axonMutability);
         }
-        //else if(116 > i && i > 116-(nLevel-(nLevel%13))){
-        //  x = i/13;
-        //  y = i%13;
-        //  for(int z = 0; z < 13+nLevel-x/13; z++){
-        //    axons[x][y][z] = new Axon((Math.random()*2-1)*axonVaribility,axonMutability);
-        //  }
-        //}
-        //else if(116 > i && i > 116-nLevel){
-        //  x = i/13;
-        //  y = i%13;
-        //  for(int z = 0; z < 13; z++){
-        //    axons[x][y][z] = new Axon((Math.random()*2-1)*axonVaribility,axonMutability);
-        //  }
-        //}
       }
       neurons = new double[brainWidth][brainHeight];
       for(int x = 0; x < 10; x++){
         for(int y = 0; y < 13; y++){
-          //if(y == brainHeight-1){
-          //  neurons[x][y] = 1;
-          //}else{
-            neurons[x][y] = 0;
-          //}
+          neurons[x][y] = 0;
         }
       }
-    }else{
+    }
+    else{
       axons = tbrain;
       neurons = tneurons;
     }
@@ -113,11 +89,13 @@ class Creature extends SoftBody{
     if(tname.length() >= 1){
       if(mutateName){
         name = mutateName(tname);
-      }else{
+      }
+      else{
         name = tname;
       }
       name = sanitizeName(name);
-    }else{
+    }
+    else{
       name = createNewName();
     }
     parents = tparents;
@@ -170,7 +148,7 @@ class Creature extends SoftBody{
     }
     noStroke();
     if(showAxons == true){
-      int nLevel = gen/5;
+      int nLevel = gen/genXP;
       if(nLevel >= 117)
         nLevel = 117;
       for(int x1 = 0; x1 < 9; x1++){
@@ -184,7 +162,7 @@ class Creature extends SoftBody{
           }
           else if(8-x1 < 1+(nLevel-1)/13){
             if((8-x1)*13+y1 < nLevel){
-              for(int z = 0; z < 13*(9-x1); z++){ //13+nLevel-(9-x1)*13; z++){               //<>//
+              for(int z = 0; z < 13*(9-x1); z++){ //<>//
                 int x2 = (129-z)/13;
                 int y2 = z%13;
                 drawAxon(x1,y1,x2,y2,z,scaleUp);
@@ -208,12 +186,12 @@ class Creature extends SoftBody{
       neurons[0][10+i] = sigmoid(memories[i]);
     }
     
-    int nLevel = gen/5;
     for(int x = 1; x < 10; x++){
       for(int y = 0; y < 12; y++){
         neurons[x][y] = 0;
       }
     }
+    int nLevel = gen/genXP;
     if(nLevel >= 117)
       nLevel = 117;
     for(int x1 = 0; x1 < 9; x1++){
@@ -269,14 +247,16 @@ class Creature extends SoftBody{
   public color neuronFillColor(double d){
     if(d >= 0){
       return color(0,0,1,(float)(d));
-    }else{
+    }
+    else{
       return color(0,0,0,(float)(-d));
     }
   }
    public color neuronTextColor(double d){
     if(d >= 0){
       return color(0,0,0);
-    }else{
+    }
+    else{
       return color(0,0,1);
     }
   }
@@ -378,7 +358,8 @@ class Creature extends SoftBody{
     vy += Math.sin(rotation)*multiplied;
     if(amount >= 0){
       loseEnergy(amount*accelerationEnergy*timeStep);
-    }else{
+    }
+    else{
       loseEnergy(Math.abs(amount*backAccelerationEnergy*timeStep));
     }
   }
@@ -404,7 +385,8 @@ class Creature extends SoftBody{
     else if(amount < 0){
       dropEnergy(-amount*timeStep);
       loseEnergy(-attemptedAmount*eatEnergy*timeStep);
-    }else{
+    }
+    else{
       Tile coveredTile = getRandomCoveredTile();
       double foodToEat = coveredTile.foodLevel*(1-Math.pow((1-eatSpeed),amount*timeStep));
       if(foodToEat > coveredTile.foodLevel){
@@ -415,7 +397,8 @@ class Creature extends SoftBody{
       double multiplier = 1.0-foodDistance/foodSensitivity;
       if(multiplier >= 0){
         addEnergy(foodToEat*multiplier);
-      }else{
+      }
+      else{
         loseEnergy(-foodToEat*multiplier);
       }
       loseEnergy(attemptedAmount*eatEnergy*timeStep);
@@ -436,7 +419,8 @@ class Creature extends SoftBody{
           }
         }
       }
-    }else{
+    }
+    else{
       fightLevel = 0;
     }
   }
@@ -519,7 +503,8 @@ class Creature extends SoftBody{
   public color getColorAt(double x, double y){
     if(x >= 0 && x < board.boardWidth && y >= 0 && y < board.boardHeight){
       return board.tiles[(int)(x)][(int)(y)].getColor();
-    }else{
+    }
+    else{
       return board.backgroundColor;
     }
   }
@@ -594,7 +579,7 @@ class Creature extends SoftBody{
             }
           }
           Creature parent1 = parents.get(a);
-          int nLevel = highestGen/5;
+          int nLevel = highestGen/genXP;
           if(nLevel >= 117)
             nLevel = 117;
           for(int x = 0; x < 9; x++){
@@ -613,7 +598,7 @@ class Creature extends SoftBody{
               }
             }
           }
-          if(highestGen%5 == 4){
+          if(highestGen%genXP == genXP-1){
             nLevel++;
             if(nLevel >= 117)
               nLevel = 117;
@@ -708,17 +693,20 @@ class Creature extends SoftBody{
       if(isVowel(ch)){
         consonantsSoFar = 0;
         vowelsSoFar++;
-      }else{
+      }
+      else{
         vowelsSoFar = 0;
         consonantsSoFar++;
       }
       if(vowelsSoFar <= 2 && consonantsSoFar <= 2){
         output = output+ch;
-      }else{
+      }
+      else{
         double chanceOfAddingChar = 0.5;
         if(input.length() <= minNameLength){
           chanceOfAddingChar = 1.0;
-        }else if(input.length() >= maxNameLength){
+        }
+        else if(input.length() >= maxNameLength){
           chanceOfAddingChar = 0.0;
         }
         if(random(0,1) < chanceOfAddingChar){
@@ -730,11 +718,13 @@ class Creature extends SoftBody{
           if(isVowel(ch)){
             consonantsSoFar = 0;
             vowelsSoFar = 1;
-          }else{
+          }
+          else{
             consonantsSoFar = 1;
             vowelsSoFar = 0;
           }
-        }else{
+        }
+        else{
         }
       }
     }
@@ -793,9 +783,11 @@ class Creature extends SoftBody{
     int sign = 1-2*(choice%2);
     if(choice < 2){
       return sign*energy;
-    }else if(choice < 4){
+    }
+    else if(choice < 4){
       return sign*birthTime;
-    }else if(choice == 6 || choice == 7){
+    }
+    else if(choice == 6 || choice == 7){
       return sign*gen;
     }
     return 0;
