@@ -33,7 +33,7 @@ class Creature extends SoftBody{
   double rotation = 0;
   final int genXP = 3;
   final int brainWidth = 10;
-  final int brainHeight = 13;
+  final int brainHeight = 14;
   final double axonMutability = 0.0005;
   final int minNameLength = 3;
   final int maxNameLength = 10;
@@ -47,7 +47,7 @@ class Creature extends SoftBody{
   double[] visionOccludedX = new double[visionAngles.length];
   double[] visionOccludedY = new double[visionAngles.length];
   double visionResults[] = new double[9];
-  int memoryCount = 3;
+  int memoryCount = brainHeight-10;
   double[] memories;
   
   double[] sizeHistory;
@@ -65,14 +65,14 @@ class Creature extends SoftBody{
     if(tbrain == null){
       axons = new Axon[brainWidth-1][brainHeight][brainHeight*brainWidth];
       neurons = new double[brainWidth][brainHeight];
-      for(int y = 0; y < 13; y++){
-        for(int z = 0; z < 13; z++){
+      for(int y = 0; y < brainHeight; y++){
+        for(int z = 0; z < brainHeight; z++){
           axons[0][y][z] = new Axon((Math.random()*2-1)*axonVaribility,axonMutability);
         }
       }
       neurons = new double[brainWidth][brainHeight];
-      for(int x = 0; x < 10; x++){
-        for(int y = 0; y < 13; y++){
+      for(int x = 0; x < brainWidth; x++){
+        for(int y = 0; y < brainHeight; y++){
           neurons[x][y] = 0;
         }
       }
@@ -125,14 +125,22 @@ class Creature extends SoftBody{
     textFont(font,0.58*scaleUp);
     fill(0,0,1);
     String[] inputLabels = {"Hue","Sat","Bri","1Hue",
-    "1Sat","1Bri","2Hue","2Sat","2Bri","MHue","Mem1","Mem2","Mem3","Mem4"};
+    "1Sat","1Bri","2Hue","2Sat","2Bri","MHue","Mem"};
     String[] outputLabels = {"Accel.","Turn","Eat","Fight","Birth","1",
-    "2","3","4","MHue","Mem1","Mem2","Mem3","Mem4"};
+    "2","3","4","MHue","Mem"};
     for(int y = 0; y < brainHeight; y++){
-      textAlign(RIGHT);
-      text(inputLabels[y],(-neuronSize-0.1)*scaleUp-20,(y+(neuronSize*0.6))*scaleUp);
-      textAlign(LEFT);
-      text(outputLabels[y],(brainWidth-1+neuronSize+0.1)*scaleUp/1.8-20,(y+(neuronSize*0.6))*scaleUp);
+      if(y > 9){
+        textAlign(RIGHT);
+        text(inputLabels[10]+(y-9),(-neuronSize-0.1)*scaleUp-20,(y+(neuronSize*0.6))*scaleUp);
+        textAlign(LEFT);
+        text(outputLabels[10]+(y-9),(brainWidth-1+neuronSize+0.1)*scaleUp/1.8-20,(y+(neuronSize*0.6))*scaleUp);
+      }
+      else{
+        textAlign(RIGHT);
+        text(inputLabels[y],(-neuronSize-0.1)*scaleUp-20,(y+(neuronSize*0.6))*scaleUp);
+        textAlign(LEFT);
+        text(outputLabels[y],(brainWidth-1+neuronSize+0.1)*scaleUp/1.8-20,(y+(neuronSize*0.6))*scaleUp);
+      }
     }
     textAlign(CENTER);
     for(int x = 0; x < brainWidth; x++){
@@ -149,22 +157,22 @@ class Creature extends SoftBody{
     noStroke();
     if(showAxons == true){
       int nLevel = gen/genXP;
-      if(nLevel >= 117)
-        nLevel = 117;
-      for(int x1 = 0; x1 < 9; x1++){
-        for(int y1 = 0; y1 < 13; y1++){
+      if(nLevel >= brainHeight*(brainWidth-1))
+        nLevel = brainHeight*(brainWidth-1);
+      for(int x1 = 0; x1 < brainWidth-1; x1++){
+        for(int y1 = 0; y1 < brainHeight; y1++){
           if(x1 == 0){
-            for(int z = 0; z < 13+nLevel; z++){
-              int x2 = (129-z)/13;
-              int y2 = z%13;
+            for(int z = 0; z < brainHeight+nLevel; z++){
+              int x2 = (brainHeight*brainWidth-1-z)/brainHeight;
+              int y2 = z%brainHeight;
               drawAxon(x1,y1,x2,y2,z,scaleUp);
             }
           }
-          else if(8-x1 < 1+(nLevel-1)/13){
-            if((8-x1)*13+y1 < nLevel){
-              for(int z = 0; z < 13*(9-x1); z++){ //<>//
-                int x2 = (129-z)/13;
-                int y2 = z%13;
+          else if(brainWidth-2-x1 < 1+(nLevel-1)/brainHeight){
+            if((brainWidth-2-x1)*brainHeight+y1 < nLevel){
+              for(int z = 0; z < brainHeight*(brainWidth-x1); z++){ //<>//
+                int x2 = (brainHeight*brainWidth-1-z)/13;
+                int y2 = z%brainHeight;
                 drawAxon(x1,y1,x2,y2,z,scaleUp);
               }
             }
@@ -186,35 +194,35 @@ class Creature extends SoftBody{
       neurons[0][10+i] = sigmoid(memories[i]);
     }
     
-    for(int x = 1; x < 10; x++){
-      for(int y = 0; y < 12; y++){
+    for(int x = 1; x < brainWidth; x++){
+      for(int y = 0; y < brainHeight; y++){
         neurons[x][y] = 0;
       }
     }
     int nLevel = gen/genXP;
-    if(nLevel >= 117)
-      nLevel = 117;
-    for(int x1 = 0; x1 < 9; x1++){
-      for(int y1 = 0; y1 < 13; y1++){
+    if(nLevel >= brainHeight*(brainWidth-1))
+      nLevel = brainHeight*(brainWidth-1);
+    for(int x1 = 0; x1 < brainWidth-1; x1++){
+      for(int y1 = 0; y1 < brainHeight; y1++){
         if(x1 == 0){
-          for(int z = 0; z < 13+nLevel; z++){
-          int x2 = (129-z)/13;
-          int y2 = z%13;
+          for(int z = 0; z < brainHeight+nLevel; z++){
+          int x2 = (brainHeight*brainWidth-1-z)/brainHeight;
+          int y2 = z%brainHeight;
           neurons[x2][y2] += neurons[x1][y1]*axons[x1][y1][z].weight;
           }
         }
-        else if(8-x1 < 1+(nLevel-1)/13){
-          if((8-x1)*13+y1 < nLevel){
-            for(int z = 0; z < 13*(9-x1); z++){ //13+nLevel-(9-x1)*13; z++){              
-              int x2 = (129-z)/13;
-              int y2 = z%13;
+        else if(brainWidth-2-x1 < 1+(nLevel-1)/brainHeight){
+          if((brainWidth-2-x1)*brainHeight+y1 < nLevel){
+            for(int z = 0; z < brainHeight*(brainWidth-1-x1); z++){ //13+nLevel-(9-x1)*13; z++){              
+              int x2 = (brainHeight*brainWidth-1-z)/brainHeight;
+              int y2 = z%brainHeight;
               neurons[x2][y2] += neurons[x1][y1]*axons[x1][y1][z].weight;
             }
           }
         } //<>//
       }
-      if(x1 < 1+nLevel/13){
-        for(int y = 0; y < 12; y++){
+      if(x1 < 1+nLevel/brainHeight){
+        for(int y = 0; y < brainHeight; y++){
           neurons[x1+1][y] = sigmoid(neurons[x1+1][y]);
         }
       }
@@ -569,7 +577,6 @@ class Creature extends SoftBody{
           String[] parentNames = new String[parentsTotal];
           Axon[][][] newBrain = new Axon[brainWidth-1][brainHeight][brainHeight*brainWidth];
           double[][] newNeurons = new double[brainWidth][brainHeight];
-          float randomParentRotation = random(0,1);
           int a = 0;
           for(int i = 0; i < parentsTotal; i++){
             Creature parent = parents.get(i);
@@ -580,18 +587,18 @@ class Creature extends SoftBody{
           }
           Creature parent1 = parents.get(a);
           int nLevel = highestGen/genXP;
-          if(nLevel >= 117)
-            nLevel = 117;
-          for(int x = 0; x < 9; x++){
-            for(int y = 0; y < 13; y++){
+          if(nLevel >= brainHeight*(brainWidth-1))
+            nLevel = brainHeight*(brainWidth-1);
+          for(int x = 0; x < brainWidth-1; x++){
+            for(int y = 0; y < brainHeight; y++){
               if(x == 0){
-                for(int z = 0; z < 13+nLevel; z++){
+                for(int z = 0; z < brainHeight+nLevel; z++){
                   newBrain[x][y][z] = parent1.axons[x][y][z].mutateAxon();
                 }
               }
-              else if(8-x < 1+(nLevel-1)/13){
-                if((8-x)*13+y < nLevel){
-                  for(int z = 0; z < 13*(9-x); z++){ //13+nLevel-(9-x1)*13; z++){
+              else if(brainWidth-2-x < 1+(nLevel-1)/brainHeight){
+                if((brainWidth-2-x)*brainHeight+y < nLevel){
+                  for(int z = 0; z < brainHeight*(brainWidth-1-x); z++){
                     newBrain[x][y][z] = parent1.axons[x][y][z].mutateAxon();
                   }
                 }
@@ -600,25 +607,23 @@ class Creature extends SoftBody{
           }
           if(highestGen%genXP == genXP-1){
             nLevel++;
-            if(nLevel >= 117)
-              nLevel = 117;
-            int x = 9-(12+nLevel)/13;
-            int y = (nLevel-1)%13;
-            for(int z = 0; z < 13+nLevel-nLevel%13; z++){
+            if(nLevel >= brainHeight*(brainWidth-1))
+              nLevel = brainHeight*(brainWidth-1);
+            int x = brainWidth-1-(brainHeight-1+nLevel)/brainHeight;
+            int y = (nLevel-1)%brainHeight;
+            for(int z = 0; z < brainHeight+nLevel-nLevel%brainHeight; z++){
               newBrain[x][y][z] = new Axon((Math.random()*2-1)*axonVaribility,axonMutability);
             }
-            for(int x1 = 0; x1 < 1+(nLevel-1)/13; x1++){
-              for(int y1 = 0; y1 < 13; y1++){
-                int z = 12+nLevel;
+            for(int x1 = 0; x1 < 1+(nLevel-1)/brainHeight; x1++){
+              for(int y1 = 0; y1 < brainHeight; y1++){
+                int z = brainHeight-1+nLevel;
                 newBrain[x1][y1][z] = new Axon((Math.random()*2-1)*axonVaribility,axonMutability);
               }
             }
           }
           for(int x = 0; x < brainWidth; x++){
             for(int y = 0; y < brainHeight; y++){
-              float axonAngle = atan2(y-brainHeight/2.0,x-brainWidth/2)/(2*PI)+PI;
-              Creature parentForAxon = parents.get((int)(((axonAngle+randomParentRotation)%1.0)*parentsTotal));
-              newNeurons[x][y] = parentForAxon.neurons[x][y];
+              newNeurons[x][y] = parent1.neurons[x][y];
             }
           }
           for(int i = 0; i < parentsTotal; i++){

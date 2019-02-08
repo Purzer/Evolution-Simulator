@@ -42,6 +42,7 @@ class Board{
   double textSaveInterval = 1;
   final double flashSpeed = 80;
   boolean userControl;
+  boolean killAllCreatures = false;
   double temperature;
   double manualBirthSize = 1.2;
   boolean wasPressingB = false;
@@ -89,7 +90,7 @@ class Board{
     creatureMinimum = cmin;
     creatureMaximum = cmax;
     creatures = new ArrayList<Creature>(0);
-    maintainCreatureMinimum(false);
+    maintainCreatureMinimum();
     for(int i = 0; i < listSlots; i++){
       list[i] = null;
     }
@@ -223,6 +224,10 @@ class Board{
         float x = (i%2)*230+10;
         float y = floor(i/2)*50+370;
         fill(buttonColor);
+        if(i == 0 && killAllCreatures == true){
+          fill(0,1,0.8);
+          buttonTexts[0] = "Yes                     No";
+        }
         rect(x,y,220,40);
         if(i >= 2 && i < 6){
           double flashAlpha = 1.0*Math.pow(0.5,(year-fileSaveTimes[i-2])*flashSpeed);
@@ -394,7 +399,7 @@ class Board{
     /*for(int i = 0; i < rocks.size(); i++){
       rocks.get(i).collide(timeStep*OBJECT_TIMESTEPS_PER_YEAR);
     }*/
-    maintainCreatureMinimum(false);
+    maintainCreatureMinimum();
     maintainCreatureMaximum();
     threadsToFinish = creatures.size();
     for(int i = 0; i < creatures.size(); i++){
@@ -548,20 +553,13 @@ class Board{
     return "Year "+nf((float)(d),0,2);
   }
   private String toAge(double d){
-    return nf((float)(year-d),0,2)+" yrs old";
+    return nf((float)(year-d),0,2)+" Years Old";
   }
-  private void maintainCreatureMinimum(boolean choosePreexisting){
+  private void maintainCreatureMinimum(){
     while(creatures.size() < creatureMinimum){
-      if(choosePreexisting){
-        Creature c = getRandomCreature();
-        c.addEnergy(c.safeSize);
-        c.reproduce(c.safeSize);
-      }
-      else{
-        creatures.add(new Creature(random(0,boardWidth),random(0,boardHeight),0,0,
-        random(minCreatureEnergy,maxCreatureEnergy),1,random(0,1),1,1,
-        this,year,random(0,2*PI),0,"","[PRIMORDIAL]",true,null,null,1,random(0,1)));
-      }
+      creatures.add(new Creature(random(0,boardWidth),random(0,boardHeight),0,0,
+      random(minCreatureEnergy,maxCreatureEnergy),1,random(0,1),1,1,
+      this,year,random(0,2*PI),0,"","[PRIMORDIAL]",true,null,null,1,random(0,1)));
     }
   }
   private void maintainCreatureMaximum(){
@@ -591,10 +589,6 @@ class Board{
         c.energy = creatureEnergy[i];
       }
     }
-  }
-  private Creature getRandomCreature(){
-    int index = (int)(random(0,creatures.size()));
-    return creatures.get(index);
   }
   private void killAllCreatures(){
     for(int i = 0; i < creatures.size(); i++){

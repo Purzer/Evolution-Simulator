@@ -119,9 +119,18 @@ void mousePressed() {
         int mX = (int)(x/230);
         int mY = (int)(y/50);
         int buttonNum = mX+mY*2;
-        //if (buttonNum == 0) {
-        //  evoBoard.userControl = !evoBoard.userControl;
-        //}
+        if (buttonNum == 0) {
+          if(!evoBoard.killAllCreatures){
+            evoBoard.killAllCreatures = true;
+          }
+          else if(clickedOnLeft){
+            evoBoard.killAllCreatures();
+            evoBoard.killAllCreatures =false;
+          }
+          else{
+            evoBoard.killAllCreatures =false;
+          }
+        }
         if (buttonNum == 1) {
           if (clickedOnLeft) {
             evoBoard.creatureMinimum -= evoBoard.creatureMinimumIncrement;
