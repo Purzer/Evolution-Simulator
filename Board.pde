@@ -33,7 +33,7 @@ class Board{
   int creatureRankMetric = 0;
   color buttonColor = color(0,0,0.5);
   Creature[] list = new Creature[listSlots];
-  final int creatureMinimumIncrement = 5;
+  final int creatureMinimumIncrement = 10;
   final int creatureMaximumIncrement = 100;
   String folder = "TEST";
   int[] fileSaveCounts;

@@ -16,7 +16,7 @@ final float maxTemp = 1.0;
 
 final int numberOfRocks = 0;
 final int creatureMin = 100;
-final int creatureMax = 1000;
+final int creatureMax = 1500;
 
 boolean showAxons = false;
 float cameraX = boardWidth*0.5;
