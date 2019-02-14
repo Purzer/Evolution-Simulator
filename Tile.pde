@@ -105,9 +105,9 @@ class Tile{
     iterate();
     color foodColor = color((float)(foodType),1,1);
     if(fertility > 1){ //<>//
-      //foodColor = color(0.6, 1.0, (float)(foodType));
-      //return interColorFixedHue(interColor(barrenColor,waterColor,fertility-.2),foodColor,foodLevel/maxGrowthLevel,hue(foodColor));
-      return waterColor;
+      foodColor = color(0.6, 1.0, (float)(foodType));
+      return interColorFixedHue(interColor(barrenColor,waterColor,fertility-.2),foodColor,foodLevel/maxGrowthLevel,hue(foodColor));
+      //return waterColor;
     }
     else if(foodLevel < maxGrowthLevel){
       return interColorFixedHue(interColor(barrenColor,fertileColor,fertility),foodColor,foodLevel/maxGrowthLevel,hue(foodColor));

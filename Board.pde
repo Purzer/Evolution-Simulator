@@ -527,7 +527,7 @@ class Board{
   //  rect(x1,(float)(y1+h*(1-prog)),w,(float)(prog*h));
   //}
   private boolean setMinTemp(float temp){
-    minTemp = tempBounds(temp); //minTemp+temp*(maxTemp-minTemp)); //<>//
+    minTemp = tempBounds(thermometerMin+temp*(thermometerMax-thermometerMin)); //<>//
     if(minTemp > maxTemp){
       float placeHolder = maxTemp;
       maxTemp = minTemp;
@@ -537,7 +537,7 @@ class Board{
     return false;
   }
   private boolean setMaxTemp(float temp){
-    maxTemp = tempBounds(temp); //minTemp+temp*(maxTemp-minTemp));
+    maxTemp = tempBounds(thermometerMin+temp*(thermometerMax-thermometerMin));
     if(minTemp > maxTemp){
       float placeHolder = maxTemp;
       maxTemp = minTemp;
@@ -547,13 +547,13 @@ class Board{
     return false;
   }
   private float tempBounds(float temp){
-    return min(max(temp,minTemp),thermometerMax);
+    return min(max(temp,thermometerMin),thermometerMax);
   }
   private float getHighTempProportion(){
-    return (maxTemp-thermometerMin)/(maxTemp-thermometerMin);
+    return (maxTemp-thermometerMin)/(thermometerMax-thermometerMin);
   }
   private float getLowTempProportion(){
-    return (minTemp-thermometerMin)/(maxTemp-thermometerMin);
+    return (minTemp-thermometerMin)/(thermometerMax-thermometerMin);
   }
   private String toDate(double d){
     return "Year "+nf((float)(d),0,2);
