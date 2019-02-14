@@ -38,7 +38,7 @@ class Board{
   String folder = "TEST";
   int[] fileSaveCounts;
   double[] fileSaveTimes;
-  double imageSaveInterval = 25;
+  double imageSaveInterval = 10;
   double textSaveInterval = 1;
   final double flashSpeed = 80;
   boolean userControl;
@@ -273,6 +273,12 @@ class Board{
       //  float h = (EUbar-110)*20+25;
       //  rect(185,280-h,25,h);
       //}
+      float energyProp = (float)(250*((selectedCreature.energy-1)/selectedCreature.energy)); //<>//
+      fill(0.333,1,0.4);
+      rect(5,235,250-energyProp,20);
+      fill(0.333,1,0.8);
+      rect(255,235,-energyProp,20);
+      
       fill(0,0,1);
       textFont(font,15);
       text("Name: "+selectedCreature.getCreatureName(),10,225);
@@ -521,7 +527,7 @@ class Board{
   //  rect(x1,(float)(y1+h*(1-prog)),w,(float)(prog*h));
   //}
   private boolean setMinTemp(float temp){
-    minTemp = tempBounds(minTemp+temp*(maxTemp-minTemp));
+    minTemp = tempBounds(temp); //minTemp+temp*(maxTemp-minTemp)); //<>//
     if(minTemp > maxTemp){
       float placeHolder = maxTemp;
       maxTemp = minTemp;
@@ -531,7 +537,7 @@ class Board{
     return false;
   }
   private boolean setMaxTemp(float temp){
-    maxTemp = tempBounds(minTemp+temp*(maxTemp-minTemp));
+    maxTemp = tempBounds(temp); //minTemp+temp*(maxTemp-minTemp));
     if(minTemp > maxTemp){
       float placeHolder = maxTemp;
       maxTemp = minTemp;

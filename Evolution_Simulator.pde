@@ -1,7 +1,7 @@
 Board evoBoard;
 
 final int seed = 1101010;
-final float noiseStepSize = 0.1;
+final float noiseStepSize = .1;
 final int boardWidth = 100;
 final int boardHeight = 100;
 
@@ -14,9 +14,9 @@ final double timeStep = 0.001;
 final float minTemp = -0.5;
 final float maxTemp = 1.0;
 
-final int numberOfRocks = 0;
+final int numberOfRocks = 000;
 final int creatureMin = 100;
-final int creatureMax = 1500;
+final int creatureMax = 2000;
 
 boolean showAxons = false;
 float cameraX = boardWidth*0.5;
@@ -28,7 +28,7 @@ int dragging = 0;
 float prevMouseX;
 float prevMouseY;
 boolean draggedFar = false;
-final String fileName = "Pics";
+final String fileName = "Pictures";
 
 void setup() {
   colorMode(HSB,1.0);

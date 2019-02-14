@@ -1,11 +1,11 @@
 class Creature extends SoftBody{
   double accelerationEnergy = 0.25;
   double backAccelerationEnergy = 0.30;
-  double swimEnergy = 0.00015;
+  double swimEnergy = 0.00025;
   double turnEnergy = 0.05;
-  double eatEnergy = 0.005;
+  double eatEnergy = 0.01;
   double eatSpeed = 0.5;
-  double eatWhileMovingMultiplier = 20.0;
+  double eatWhileMovingMultiplier = 10.0;
   double fightEnergy = 0.25;
   double injuredEnergy = 0.50;
   double metabolismEnergy = 0.0025;
@@ -433,7 +433,7 @@ class Creature extends SoftBody{
           double combinedRadius = getRadius()*fightRange+collider.getRadius();
           if(distance < combinedRadius){
             ((Creature)collider).loseEnergy(fightLevel*injuredEnergy*timeStep);
-            addEnergy(fightLevel*injuredEnergy*timeStep*15);
+            addEnergy(fightLevel*injuredEnergy*timeStep*10);
           }
         }
       }
@@ -560,7 +560,7 @@ class Creature extends SoftBody{
       if(colliders == null){
         collide();
       }
-      int highestGen = 0;
+      //int highestGen = 0;
       if(babySize >= 0){
         ArrayList<Creature> parents = new ArrayList<Creature>(0);
         parents.add(this);
@@ -587,19 +587,10 @@ class Creature extends SoftBody{
           String[] parentNames = new String[parentsTotal];
           Axon[][][] newBrain = new Axon[brainWidth-1][brainHeight][brainHeight*brainWidth];
           double[][] newNeurons = new double[brainWidth][brainHeight];
-          int a = 0;
-          for(int i = 0; i < parentsTotal; i++){
-            Creature parent = parents.get(i);
-            if(parent.gen > highestGen){
-              highestGen = parent.gen;
-              a = i;
-            }
-          }
-          Creature parent1 = parents.get(a);
-          int nLevel = highestGen/neuralGrowthRate;
+          int nLevel = gen/neuralGrowthRate;
           if(nLevel > brainHeight*(brainWidth-1))
             nLevel = brainHeight*(brainWidth-1);
-          int mLevel = highestGen/memoryGrowthRate;
+          int mLevel = gen/memoryGrowthRate;
           if(mLevel > brainHeight)
             mLevel = brainHeight;
           for(int x = 0; x < brainWidth-1; x++){
@@ -608,7 +599,7 @@ class Creature extends SoftBody{
                 if(y < 10+mLevel){
                   for(int z = 0; z < brainHeight+nLevel; z++){
                     if(z < 10+mLevel || z > brainHeight-1){
-                      newBrain[x][y][z] = parent1.axons[x][y][z].mutateAxon();
+                      newBrain[x][y][z] = axons[x][y][z].mutateAxon();
                     }
                   }
                 }
@@ -617,13 +608,13 @@ class Creature extends SoftBody{
                 if((brainWidth-2-x)*brainHeight+y < nLevel){
                   for(int z = 0; z < brainHeight*(brainWidth-1-x); z++){
                     if(z < 10+mLevel || z > brainHeight-1)
-                      newBrain[x][y][z] = parent1.axons[x][y][z].mutateAxon();
+                      newBrain[x][y][z] = axons[x][y][z].mutateAxon();
                   }
                 }
               }
             }
           }
-          if(highestGen%neuralGrowthRate == neuralGrowthRate-1){
+          if(gen%neuralGrowthRate == neuralGrowthRate-1){
             nLevel++;
             if(nLevel > brainHeight*(brainWidth-1))
               nLevel = brainHeight*(brainWidth-1);
@@ -639,7 +630,7 @@ class Creature extends SoftBody{
               }
             }
           }
-          if(highestGen%memoryGrowthRate == memoryGrowthRate-1){
+          if(gen%memoryGrowthRate == memoryGrowthRate-1){
             mLevel++;
             if(mLevel > brainHeight)
               mLevel = brainHeight;
@@ -663,7 +654,7 @@ class Creature extends SoftBody{
           }
           for(int x = 0; x < brainWidth; x++){
             for(int y = 0; y < brainHeight; y++){
-              newNeurons[x][y] = parent1.neurons[x][y];
+              newNeurons[x][y] = neurons[x][y];
             }
           }
           for(int i = 0; i < parentsTotal; i++){
@@ -678,9 +669,6 @@ class Creature extends SoftBody{
             newBrightness += parent.brightness/parentsTotal;
             newMouthHue += parent.mouthHue/parentsTotal;
             parentNames[i] = parent.name;
-            if(parent.gen > highestGen){
-              highestGen = parent.gen;
-            }
           }
           newHue = newHue + (double)random(-0.05,0.05);
           //newSaturation += (double)random(-0.05,0.05);
@@ -688,7 +676,7 @@ class Creature extends SoftBody{
           board.creatures.add(new Creature(newPX,newPY,0,0,
             babySize,density,newHue,newSaturation,newBrightness,board,board.year,random(0,2*PI),0,
             stitchName(parentNames),andifyParents(parentNames),true,
-            newBrain,newNeurons,highestGen+1,newMouthHue));
+            newBrain,newNeurons,gen+1,newMouthHue));
         }
       }
     }
