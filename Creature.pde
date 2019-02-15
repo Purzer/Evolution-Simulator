@@ -1,14 +1,14 @@
 class Creature extends SoftBody{
-  double accelerationEnergy = 0.25;
-  double backAccelerationEnergy = 0.30;
-  double swimEnergy = 0.00025;
-  double turnEnergy = 0.05;
-  double eatEnergy = 0.01;
+  double accelerationEnergy = 0.5;
+  double backAccelerationEnergy = 0.60;
+  double swimEnergy = 0.0005;
+  double turnEnergy = 0.1;
+  double eatEnergy = 0.02;
   double eatSpeed = 0.5;
   double eatWhileMovingMultiplier = 10.0;
-  double fightEnergy = 0.25;
-  double injuredEnergy = 0.50;
-  double metabolismEnergy = 0.0025;
+  double fightEnergy = 0.5;
+  double injuredEnergy = 1.0;
+  double metabolismEnergy = 0.005;
   String name;
   String parents;
   int gen;
@@ -28,6 +28,7 @@ class Creature extends SoftBody{
   final double birthDelay = birthDelayMin+(Math.random()*(birthDelayMax-birthDelayMin));
   final double axonVaribility = 1.0;
   final double foodSensitivity = 2.00;
+  final double maxDetailedZoom = 3.5;
   
   double vr = 0;
   double rotation = 0;
@@ -296,7 +297,7 @@ class Creature extends SoftBody{
   public void drawSoftBody(float scaleUp, float camZoom, boolean showVision){
     ellipseMode(RADIUS);
     double radius = getRadius();
-    if(showVision){
+    if(showVision && camZoom > maxDetailedZoom){
       for(int i = 0; i < visionAngles.length; i++){
         color visionUIcolor = color(0,0,1);
         if(visionResults[i*3+2] > brightnessThreshold){
@@ -319,10 +320,12 @@ class Creature extends SoftBody{
         (float)((visionOccludedX[i]+crossSize)*scaleUp),(float)((visionOccludedY[i]-crossSize)*scaleUp));
       }
     noStroke();
-    if(fightLevel > 0){
-      fill(0,1,1,(float)(fightLevel*0.8));
-      ellipse((float)(px*scaleUp),(float)(py*scaleUp),(float)(fightRange*radius*scaleUp),(float)(fightRange*radius*scaleUp));
     }
+    if(showVision){
+      if(fightLevel > 0){
+        fill(0,1,1,(float)(fightLevel*0.8));
+        ellipse((float)(px*scaleUp),(float)(py*scaleUp),(float)(fightRange*radius*scaleUp),(float)(fightRange*radius*scaleUp));
+      }
     }
     strokeWeight(board.creatureStrokeWeight);
     stroke(0,0,1);
@@ -332,32 +335,34 @@ class Creature extends SoftBody{
       (float)(radius*scaleUp+1+75.0/camZoom),(float)(radius*scaleUp+1+75.0/camZoom));
     }
     super.drawSoftBody(scaleUp);
-    noFill();
-    strokeWeight(board.creatureStrokeWeight);
-    stroke(0,0,1);
-    ellipseMode(RADIUS);
-    ellipse((float)(px*scaleUp),(float)(py*scaleUp),
-      (float)(board.minSurvivableSize*scaleUp),(float)(board.minSurvivableSize*scaleUp));
-    pushMatrix();
-    translate((float)(px*scaleUp),(float)(py*scaleUp));
-    scale((float)radius);
-    rotate((float)rotation);
-    strokeWeight((float)(board.creatureStrokeWeight/radius));
-    stroke(0,0,0);
-    fill((float)mouthHue,1.0,1.0);
-    ellipse(0.6*scaleUp,0,0.37*scaleUp,0.37*scaleUp);
-    /*rect(-0.7*scaleUp,-0.2*scaleUp,1.1*scaleUp,0.4*scaleUp);
-    beginShape();
-    vertex(0.3*scaleUp,-0.5*scaleUp);
-    vertex(0.3*scaleUp,0.5*scaleUp);
-    vertex(0.8*scaleUp,0.0*scaleUp);
-    endShape(CLOSE);*/
-    popMatrix();
-    if(showVision){
-      fill(0,0,1);
-      textFont(font,0.2*scaleUp);
-      textAlign(CENTER);
-      text(getCreatureName(),(float)(px*scaleUp),(float)((py-getRadius()*1.4-0.07)*scaleUp));
+    if(camZoom > maxDetailedZoom){
+      noFill();
+      strokeWeight(board.creatureStrokeWeight);
+      stroke(0,0,1);
+      ellipseMode(RADIUS);
+      ellipse((float)(px*scaleUp),(float)(py*scaleUp),
+        (float)(board.minSurvivableSize*scaleUp),(float)(board.minSurvivableSize*scaleUp));
+      pushMatrix();
+      translate((float)(px*scaleUp),(float)(py*scaleUp));
+      scale((float)radius);
+      rotate((float)rotation);
+      strokeWeight((float)(board.creatureStrokeWeight/radius));
+      stroke(0,0,0);
+      fill((float)mouthHue,1.0,1.0);
+      ellipse(0.6*scaleUp,0,0.37*scaleUp,0.37*scaleUp);
+      /*rect(-0.7*scaleUp,-0.2*scaleUp,1.1*scaleUp,0.4*scaleUp);
+      beginShape();
+      vertex(0.3*scaleUp,-0.5*scaleUp);
+      vertex(0.3*scaleUp,0.5*scaleUp);
+      vertex(0.8*scaleUp,0.0*scaleUp);
+      endShape(CLOSE);*/
+      popMatrix();
+      if(showVision){
+        fill(0,0,1);
+        textFont(font,0.2*scaleUp);
+        textAlign(CENTER);
+        text(getCreatureName(),(float)(px*scaleUp),(float)((py-getRadius()*1.4-0.07)*scaleUp));
+      }
     }
   }
   public void metabolize(double timeStep){
@@ -433,7 +438,7 @@ class Creature extends SoftBody{
           double combinedRadius = getRadius()*fightRange+collider.getRadius();
           if(distance < combinedRadius){
             ((Creature)collider).loseEnergy(fightLevel*injuredEnergy*timeStep);
-            addEnergy(fightLevel*injuredEnergy*timeStep*10);
+            addEnergy(fightLevel*injuredEnergy*timeStep*12);
           }
         }
       }

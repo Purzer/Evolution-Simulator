@@ -44,7 +44,7 @@ class Tile{
     fill(landColor);
     rect(posX*scaleUp,posY*scaleUp,scaleUp,scaleUp);
     if(showEnergy){
-      if(brightness(landColor) >= 0.7){
+      if(brightness(landColor) >= 0.9){
         fill(0,0,0,1);
       }
       else{
@@ -104,16 +104,15 @@ class Tile{
   public color getColor(){
     iterate();
     color foodColor = color((float)(foodType),1,1);
-    if(fertility > 1){ //<>//
+    if(fertility > 1){
       foodColor = color(0.6, 1.0, (float)(foodType));
       return interColorFixedHue(interColor(barrenColor,waterColor,fertility-.2),foodColor,foodLevel/maxGrowthLevel,hue(foodColor));
-      //return waterColor;
     }
-    else if(foodLevel < maxGrowthLevel){
+    else if(foodLevel < 1.7){
       return interColorFixedHue(interColor(barrenColor,fertileColor,fertility),foodColor,foodLevel/maxGrowthLevel,hue(foodColor));
     }
     else{
-      return interColorFixedHue(foodColor,blackColor,1.0-maxGrowthLevel/foodLevel,hue(foodColor));
+      return interColorFixedHue(interColor(barrenColor,fertileColor,fertility),foodColor,1.7/maxGrowthLevel,hue(foodColor));
     }
   }
   public color interColor(color a, color b, double x){

@@ -273,7 +273,7 @@ class Board{
       //  float h = (EUbar-110)*20+25;
       //  rect(185,280-h,25,h);
       //}
-      float energyProp = (float)(250*((selectedCreature.energy-1)/selectedCreature.energy)); //<>//
+      float energyProp = (float)(250*((selectedCreature.energy-1)/selectedCreature.energy));
       fill(0.333,1,0.4);
       rect(5,235,250-energyProp,20);
       fill(0.333,1,0.8);
@@ -304,7 +304,7 @@ class Board{
         text("Brain Control",400,460,100,40);
       }
       else{
-        text("User Control",400,460,100,40);
+        text("User Control",400,460,100,40); //<>//
       }
       textAlign(LEFT);
       if(selectedCreature.userControl){
@@ -374,9 +374,9 @@ class Board{
     cameraY = (float)evoBoard.selectedCreature.py;
     }
     else{
-     for(int i = 0; i < creatures.size(); i++){
-       creatures.get(i).userControl = false;
-     }
+      for(int i = 0; i < creatures.size(); i++){
+        creatures.get(i).userControl = false;
+      }
     }
     if(Math.floor(year/recordPopulationEvery) != Math.floor(prevYear/recordPopulationEvery)){
       for(int i = populationHistoryLength-1; i >= 1; i--){
@@ -401,6 +401,9 @@ class Board{
     }*/
     for(int i = 0; i < creatures.size(); i++){
       creatures.get(i).setPreviousEnergy();
+      //if(creatures.get(i).px == null || creatures.get(i).py == null){
+      //  creatures.get(i).returnToEarth();
+      //}
     }
     /*for(int i = 0; i < rocks.size(); i++){
       rocks.get(i).collide(timeStep*OBJECT_TIMESTEPS_PER_YEAR);
@@ -527,7 +530,7 @@ class Board{
   //  rect(x1,(float)(y1+h*(1-prog)),w,(float)(prog*h));
   //}
   private boolean setMinTemp(float temp){
-    minTemp = tempBounds(thermometerMin+temp*(thermometerMax-thermometerMin)); //<>//
+    minTemp = tempBounds(thermometerMin+temp*(thermometerMax-thermometerMin));
     if(minTemp > maxTemp){
       float placeHolder = maxTemp;
       maxTemp = minTemp;
@@ -569,30 +572,17 @@ class Board{
     }
   }
   private void maintainCreatureMaximum(){
-    int[] savedCreatures = new int[creatureMinimum];
-    double[] creatureEnergy = new double[creatureMinimum];
-    boolean newCreature = false;
+    ArrayList<Creature> deadCreatures = new ArrayList<Creature>(0);
     if(creatures.size() > creatureMaximum && creatureMaximum > creatureMinimum){
-      for(int i = 0; i < creatureMinimum; i++){
-        newCreature = false;
-        while(newCreature == false){
-          savedCreatures[i] = (int)(random(0,creatures.size()));
-          newCreature = true;
-          for(int x = 0; x > i; x++){
-            if (savedCreatures[i] == savedCreatures[x]){
-              newCreature = false;
-            }
-          }
-        }
+      for(int i = 0; i < creatures.size(); i++){
+        deadCreatures.add(creatures.get(i));
       }
-      for(int i = 0; i < creatureMinimum; i++){ //<>//
-        Creature c = creatures.get(savedCreatures[i]);
-        creatureEnergy[i] = c.energy;
-      }  
-      killAllCreatures();
       for(int i = 0; i < creatureMinimum; i++){
-        Creature c = creatures.get(savedCreatures[i]);
-        c.energy = creatureEnergy[i];
+        deadCreatures.remove((int)random(0,deadCreatures.size()));
+      }
+      for(int i = 0; i < deadCreatures.size(); i++){
+        Creature deadCreature = deadCreatures.get(i);
+        deadCreature.energy = 0;
       }
     }
   }

@@ -1,6 +1,6 @@
 Board evoBoard;
 
-final int seed = 1101010;
+final int seed = (int)random(-100000,100000);
 final float noiseStepSize = .1;
 final int boardWidth = 100;
 final int boardHeight = 100;
@@ -15,8 +15,8 @@ final float minTemp = -0.5;
 final float maxTemp = 1.0;
 
 final int numberOfRocks = 000;
-final int creatureMin = 100;
-final int creatureMax = 2000;
+final int creatureMin = 200;
+final int creatureMax = 3000;
 
 boolean showAxons = false;
 float cameraX = boardWidth*0.5;
@@ -33,6 +33,7 @@ final String fileName = "Pictures";
 void setup() {
   colorMode(HSB,1.0);
   font = loadFont("Font.vlw");
+  
   size(1366,786); //windowWidth, windowHeight
   evoBoard = new Board(boardWidth, boardHeight, noiseStepSize, minTemp, maxTemp, 
   numberOfRocks, creatureMin, creatureMax, seed, fileName, timeStep);
@@ -133,9 +134,11 @@ void mousePressed() {
         }
         if (buttonNum == 1) {
           if (clickedOnLeft) {
-            evoBoard.creatureMinimum -= evoBoard.creatureMinimumIncrement;
+            if(evoBoard.creatureMinimum-evoBoard.creatureMinimumIncrement >= 0){
+              evoBoard.creatureMinimum -= evoBoard.creatureMinimumIncrement;
+            }
           } 
-          else {
+          else{
             evoBoard.creatureMinimum += evoBoard.creatureMinimumIncrement;
           }
         }
