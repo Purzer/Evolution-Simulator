@@ -126,9 +126,27 @@ class Board{
     rect(0,0,scaleUp*boardWidth,scaleUp*boardHeight);
   }
   public void drawUI(float scaleUp, double timeStep, int x1, int y1, int x2, int y2, PFont font){
+    if(selectedCreature != null){
+      pushMatrix();
+      fill(0,0,0.4);
+      noStroke();
+      rect(1050,65,215,370); 
+      translate(1116-bCameraX,80-bCameraY); //<>//
+      selectedCreature.drawBrain(font,26*bZoom);
+      popMatrix();
+    }
+    
     fill(0,0,0);
     noStroke();
-    rect(x1,y1,x2-x1,y2-y1);
+    if(selectedCreature == null){
+      rect(x1,y1,x2-x1,y2-y1);
+    }
+    else{
+      rect(786,0,264,786);
+      rect(1050,0,316,65);
+      rect(1265,0,101,786);
+      rect(1050,435,316,351);
+    }
     
     pushMatrix();
     translate(x1,y1);
@@ -144,6 +162,7 @@ class Board{
     text(seasons[(int)((getSeason()+0.125)*4)],180,80);
     
     if(selectedCreature == null){
+      text("Seed: " + seed,270,80);
       for(int i = 0; i < listSlots; i++){
         list[i] = null;
       }
@@ -304,17 +323,19 @@ class Board{
         text("Brain Control",400,460,100,40);
       }
       else{
-        text("User Control",400,460,100,40); //<>//
+        text("User Control",400,460,100,40);
       }
       textAlign(LEFT);
       if(selectedCreature.userControl){
         text("Controls:\nUp/Down: Move\nLeft/Right: Rotate\nSpace: Eat\nF: Fight\nV: Vomit\nU,J: Change color"+
         "\nI,K: Change mouth color\nB: Give birth (Not possible if under "+Math.round((manualBirthSize+1)*100)+" energy)",150,325,250,400);
       }
-      pushMatrix();
-      translate(330,80);
-      selectedCreature.drawBrain(font,26);
-      popMatrix();
+      //pushMatrix();
+      //fill(0,0,0.4);
+      //rect(265,65,215,370); 
+      //translate(330-bCameraX,80-bCameraY);
+      //selectedCreature.drawBrain(font,26*bZoom);
+      //popMatrix();
       
       selectedCreature.drawSizeGraph(x1,x2,y2);
       fill(0,0,1);
@@ -324,10 +345,14 @@ class Board{
       
       fill(buttonColor);
       rect(325,15,100,30);
+      rect(164,100,80,40);
       fill(0,0,1);
       textAlign(CENTER);
       textFont(font,17);
       text("Show Axons",375,35);
+      text("Reset Brain",204,115);
+      text("Zoom",204,135);
+      
     }
     popMatrix();
    

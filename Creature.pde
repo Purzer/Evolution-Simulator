@@ -36,8 +36,8 @@ class Creature extends SoftBody{
   final int neuralGrowthRate = 5;
   int mLevel;
   final int memoryGrowthRate = 20;
-  final int brainWidth = 10;
-  final int brainHeight = 14;
+  //final int brainWidth = 20;
+  //final int brainHeight = 20;
   final double axonMutability = 0.0005;
   final int minNameLength = 3;
   final int maxNameLength = 10;
@@ -126,9 +126,6 @@ class Creature extends SoftBody{
   }
   public void drawBrain(PFont font, float scaleUp){
     final float neuronSize = 0.15;
-    noStroke();
-    fill(0,0,0.4);
-    rect((-1.7-neuronSize)*scaleUp-15,-neuronSize*scaleUp-12,(2.4+brainWidth+neuronSize*2)*scaleUp/1.7+20,(brainHeight+neuronSize*2)*scaleUp);  
     
     ellipseMode(RADIUS);
     strokeWeight(2);
@@ -140,30 +137,41 @@ class Creature extends SoftBody{
     "2","3","4","MHue","Mem"};
     for(int y = 0; y < brainHeight; y++){
       if(y > 9){
-        textAlign(RIGHT);
-        text(inputLabels[10]+(y-9),(-neuronSize-0.1)*scaleUp-20,(y+(neuronSize*0.6))*scaleUp);
-        textAlign(LEFT);
-        text(outputLabels[10]+(y-9),(brainWidth-1+neuronSize+0.1)*scaleUp/1.8-20,(y+(neuronSize*0.6))*scaleUp);
+        if(950 < 1096-bCameraX-0.25*scaleUp){
+          textAlign(RIGHT);
+          text(inputLabels[10]+(y-9),-0.25*scaleUp-20,y*scaleUp);
+        }
+        if(950 < 1096-bCameraX+(brainWidth-0.75)*scaleUp/1.8){
+          textAlign(LEFT);
+          text(outputLabels[10]+(y-9),(brainWidth-0.75)*scaleUp/1.8-20,y*scaleUp);
+        }
       }
       else{
-        textAlign(RIGHT);
-        text(inputLabels[y],(-neuronSize-0.1)*scaleUp-20,(y+(neuronSize*0.6))*scaleUp);
-        textAlign(LEFT);
-        text(outputLabels[y],(brainWidth-1+neuronSize+0.1)*scaleUp/1.8-20,(y+(neuronSize*0.6))*scaleUp);
+        if(950 < 1096-bCameraX-0.25*scaleUp){
+          textAlign(RIGHT);
+          text(inputLabels[y],-0.25*scaleUp-20,y*scaleUp);
+        }
+        if(950 < 1096-bCameraX+(brainWidth-0.75)*scaleUp/1.8){
+          textAlign(LEFT);
+          text(outputLabels[y],(brainWidth-0.75)*scaleUp/1.8-20,y*scaleUp);
+        }
       }
     }
     textAlign(CENTER);
     for(int x = 0; x < brainWidth; x++){
-      for(int y = 0; y < brainHeight; y++){
-        //noStroke();
-        strokeWeight(1);
-        double val = neurons[x][y];
-        fill(neuronFillColor(val));
-        ellipse(x*scaleUp/1.9-20,y*scaleUp,neuronSize*scaleUp,neuronSize*scaleUp);
-        //fill(neuronTextColor(val));
-        //text(nf((float)val,0,1),x*scaleUp,(y+(neuronSize*0.6))*scaleUp);
+      if(950 < 1096-bCameraX+x*scaleUp/1.9){
+        for(int y = 0; y < brainHeight; y++){
+          //noStroke();
+          strokeWeight(1);
+          double val = neurons[x][y];
+          fill(neuronFillColor(val));
+          ellipse(x*scaleUp/1.9-20,y*scaleUp,neuronSize*scaleUp,neuronSize*scaleUp);
+          //fill(neuronTextColor(val));
+          //text(nf((float)val,0,1),x*scaleUp,(y+(neuronSize*0.6))*scaleUp);
+        }
       }
     }
+    strokeWeight(1);
     noStroke();
     if(showAxons == true){
       for(int x1 = 0; x1 < brainWidth-1; x1++){
@@ -172,10 +180,22 @@ class Creature extends SoftBody{
             for(int z = 0; z < brainHeight+nLevel; z++){
               int x2 = (brainHeight*brainWidth-1-z)/brainHeight;
               int y2 = z%brainHeight;
-              if(x2 < brainWidth-1 && y1 <10+mLevel)
-                drawAxon(x1,y1,x2,y2,z,scaleUp);
-              else if(y2 < 10+mLevel && y1 < 10+mLevel)
-                drawAxon(x1,y1,x2,y2,z,scaleUp);
+              if(950 < 1096-bCameraX+x1*scaleUp/1.9 && 950 < 1096-bCameraX+x2*scaleUp/1.9){
+                if(x2 < brainWidth-1 && y1 <10+mLevel)
+                  drawAxon(x1,y1,x2,y2,z,scaleUp);
+                else if(y2 < 10+mLevel && y1 < 10+mLevel)
+                  drawAxon(x1,y1,x2,y2,z,scaleUp);
+              }
+              else if(950 < 1096-bCameraX+x2*scaleUp/1.9){
+                int dx = x2-x1;
+                int dy = y2-y1;
+                float x = (bCameraX-146)*1.9/scaleUp;
+                float y = (x*dy)/dx+y1;
+                if(x2 < brainWidth-1 && y1 <10+mLevel)
+                  drawAxon2(x1,y1,x2,y2,z,x,y,scaleUp);
+                else if(y2 < 10+mLevel && y1 < 10+mLevel)
+                  drawAxon2(x1,y1,x2,y2,z,x,y,scaleUp);
+              }
             }
           }
           else if(brainWidth-2-x1 < 1+(nLevel-1)/brainHeight){
@@ -183,8 +203,20 @@ class Creature extends SoftBody{
               for(int z = 0; z < brainHeight*(brainWidth-1-x1); z++){
                 int x2 = (brainHeight*brainWidth-1-z)/brainHeight;
                 int y2 = z%brainHeight;
-                if(y2 < 10+mLevel || x2 != brainWidth-1)
-                  drawAxon(x1,y1,x2,y2,z,scaleUp);
+                if(950 < 1096-bCameraX+x1*scaleUp/1.9 && 950 < 1096-bCameraX+x2*scaleUp/1.9){
+                  if(y2 < 10+mLevel || x2 != brainWidth-1)
+                    drawAxon(x1,y1,x2,y2,z,scaleUp);
+                }
+                else if(950 < 1096-bCameraX+x2*scaleUp/1.9){
+                int dx = x2-x1;
+                int dy = y2-y1;
+                float x = (bCameraX-146)*1.9/scaleUp;
+                float y = (x*dx)/dy+y1;
+                if(x2 < brainWidth-1 && y1 <10+mLevel)
+                  drawAxon2(x1,y1,x2,y2,z,x,y,scaleUp);
+                else if(y2 < 10+mLevel && y1 < 10+mLevel)
+                  drawAxon2(x1,y1,x2,y2,z,x,y,scaleUp);
+                }
               }
             }
           }
@@ -195,6 +227,10 @@ class Creature extends SoftBody{
   public void drawAxon(int x1, int y1, int x2, int y2, int z, float scaleUp){
     stroke(neuronFillColor(axons[x1][y1][z].weight)); //*neurons[x1][y1]));
     line(x1*scaleUp/1.9-20,y1*scaleUp,x2*scaleUp/1.9-20,y2*scaleUp);
+  }
+  public void drawAxon2(int x1, int y1, int x2, int y2, int z, float x, float y, float scaleUp){
+    stroke(neuronFillColor(axons[x1][y1][z].weight)); //*neurons[x1][y1]));
+    line(x*scaleUp/1.9-20,y*scaleUp,x2*scaleUp/1.9-20,y2*scaleUp);
   }
   public void useBrain(double timeStep, boolean useOutput){
     for(int i = 0; i < 9; i++){
