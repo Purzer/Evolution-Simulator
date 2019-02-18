@@ -1,12 +1,12 @@
 class Creature extends SoftBody{
-  double accelerationEnergy = 0.5;
-  double backAccelerationEnergy = 0.60;
-  double swimEnergy = 0.0005;
+  double accelerationEnergy = 0.7;
+  double backAccelerationEnergy = 0.8;
+  double swimEnergy = 0.001;
   double turnEnergy = 0.1;
-  double eatEnergy = 0.02;
+  double eatEnergy = 0.025;
   double eatSpeed = 0.5;
-  double eatWhileMovingMultiplier = 10.0;
-  double fightEnergy = 0.5;
+  float eatWhileMovingMultiplier = 10.0;
+  double fightEnergy = 0.65;
   double injuredEnergy = 1.0;
   double metabolismEnergy = 0.005;
   String name;
@@ -33,11 +33,9 @@ class Creature extends SoftBody{
   double vr = 0;
   double rotation = 0;
   int nLevel;
-  final int neuralGrowthRate = 5;
+  final int neuralGrowthRate = 2;
   int mLevel;
-  final int memoryGrowthRate = 20;
-  //final int brainWidth = 20;
-  //final int brainHeight = 20;
+  final int memoryGrowthRate = 5;
   final double axonMutability = 0.0005;
   final int minNameLength = 3;
   final int maxNameLength = 10;
@@ -355,8 +353,8 @@ class Creature extends SoftBody{
         line((float)((visionOccludedX[i]-crossSize)*scaleUp),(float)((visionOccludedY[i]+crossSize)*scaleUp),
         (float)((visionOccludedX[i]+crossSize)*scaleUp),(float)((visionOccludedY[i]-crossSize)*scaleUp));
       }
-    noStroke();
     }
+    noStroke();
     if(showVision){
       if(fightLevel > 0){
         fill(0,1,1,(float)(fightLevel*0.8));
@@ -439,7 +437,7 @@ class Creature extends SoftBody{
     return board.tiles[x][y];
   }
   public void eat(double attemptedAmount, double timeStep){
-    double amount = attemptedAmount/(1.0+(distance(0,0,vx,vy)*eatWhileMovingMultiplier));
+    double amount = attemptedAmount/(1.0+(pow((float)distance(0,0,vx,vy),eatWhileMovingMultiplier)));
     if(distance(0,0,vx,vy) > .005){}
     else if(amount < 0){
       dropEnergy(-amount*timeStep);

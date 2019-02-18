@@ -409,9 +409,9 @@ class Board{
       }
       populationHistory[0] = creatures.size();
     }
-    temperature = getGrowthRate(getSeason());
-    double tempChangeIntoThisFrame = temperature-getGrowthRate(getSeason()-timeStep);
-    double tempChangeOutOfThisFrame = getGrowthRate(getSeason()+timeStep)-temperature;
+    temperature = getGrowthRate(getSeason(),0.25);
+    double tempChangeIntoThisFrame = temperature-getGrowthRate(getSeason()-timeStep,0.25);
+    double tempChangeOutOfThisFrame = getGrowthRate(getSeason()+timeStep,0.25)-temperature;
     if(tempChangeIntoThisFrame*tempChangeOutOfThisFrame <= 0){
       for(int x = 0; x < boardWidth; x++){
         for(int y = 0; y < boardHeight; y++){
@@ -424,12 +424,7 @@ class Board{
         tiles[x][y].iterate(this, year);
       }
     }*/
-    for(int i = 0; i < creatures.size(); i++){
-      creatures.get(i).setPreviousEnergy();
-      //if(creatures.get(i).px == null || creatures.get(i).py == null){
-      //  creatures.get(i).returnToEarth();
-      //}
-    }
+    
     /*for(int i = 0; i < rocks.size(); i++){
       rocks.get(i).collide(timeStep*OBJECT_TIMESTEPS_PER_YEAR);
     }*/
@@ -501,15 +496,26 @@ class Board{
       prepareForFileSave(3);
     }
   }
-  private double getGrowthRate(double theTime){
+  private double getGrowthRate(double theTime, double climate){
     double temperatureRange = maxTemp-minTemp;
-    return minTemp+temperatureRange*0.5-temperatureRange*0.5*Math.cos(theTime*2*Math.PI);
+    double temp = 2*(0.25-climate);
+    return (minTemp+temperatureRange*0.5-temperatureRange*0.5*Math.cos(theTime*2*Math.PI))+temp;
   }
-  private double getGrowthOverTimeRange(double startTime, double endTime){
-    double temperatureRange = maxTemp-minTemp;
-    double m = minTemp+temperatureRange*0.5;
-    return (endTime-startTime)*m+(temperatureRange/Math.PI/4.0)*
-    (Math.sin(2*Math.PI*startTime)-Math.sin(2*Math.PI*endTime));
+  private double getGrowthOverTimeRange(double startTime, double endTime, double climate){
+    //old temperature funtion
+    //double temperatureRange = maxTemp-minTemp;
+    //double m = minTemp+temperatureRange*0.5;
+    //return (endTime-startTime)*m+(temperatureRange/Math.PI/4.0)*
+    //(Math.sin(2*Math.PI*startTime)-Math.sin(2*Math.PI*endTime));
+    
+    //new temperature funtion
+    double growth = 0;
+    double x = startTime;
+    for(double i = startTime; i <= endTime; i += timeStep);{
+      growth += (Math.pow(Math.E,-(Math.pow(getGrowthRate(x,climate)-0.4,2)))-0.7)/20;
+      x += timeStep;
+    }
+    return growth;
   }
   private double getSeason(){
     return (year%1.0);

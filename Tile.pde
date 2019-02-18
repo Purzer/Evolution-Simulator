@@ -54,13 +54,13 @@ class Tile{
       textFont(font,6);
       text(nf((float)(100*foodLevel),0,2)+" Energy",(posX+0.5)*scaleUp,(posY+0.3)*scaleUp);
       text("Climate: "+nf((float)(climateType),0,2),(posX+0.5)*scaleUp,(posY+0.6)*scaleUp);
-      text("Food: "+nf((float)(foodType),0,2),(posX+0.5)*scaleUp,(posY+0.9)*scaleUp);
+      text("Temp: "+String.format("%.2g%n",board.getGrowthRate(board.getSeason(),climateType)),(posX+0.5)*scaleUp,(posY+0.9)*scaleUp);
     }
   }
   public void iterate(){
     double updateTime = board.year;
     if(Math.abs(lastUpdateTime-updateTime) >= 0.00001){
-      double growthChange = board.getGrowthOverTimeRange(lastUpdateTime,updateTime);
+      double growthChange = board.getGrowthOverTimeRange(lastUpdateTime,updateTime,climateType);
       if(fertility > 1){
         foodLevel = 0;
       }

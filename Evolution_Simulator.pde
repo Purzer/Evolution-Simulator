@@ -15,7 +15,7 @@ final float minTemp = -0.5;
 final float maxTemp = 1.0;
 
 final int numberOfRocks = 000;
-final int creatureMin = 1;
+final int creatureMin = 100;
 final int creatureMax = 3000;
 
 final int brainWidth = 10;
