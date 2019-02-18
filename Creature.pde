@@ -1,9 +1,9 @@
 class Creature extends SoftBody{
-  double accelerationEnergy = 0.7;
-  double backAccelerationEnergy = 0.8;
-  double swimEnergy = 0.001;
+  double accelerationEnergy = 0.5;
+  double backAccelerationEnergy = 0.6;
+  double swimEnergy = 0.0005;
   double turnEnergy = 0.1;
-  double eatEnergy = 0.025;
+  double eatEnergy = 0.02;
   double eatSpeed = 0.5;
   float eatWhileMovingMultiplier = 10.0;
   double fightEnergy = 0.65;
@@ -56,13 +56,12 @@ class Creature extends SoftBody{
   
   float crossSize = 0.022;
   
-  double mouthHue;
   CreatureThread thread;
   
   public Creature(double tpx, double tpy, double tvx, double tvy, double tenergy,
   double tdensity, double thue, double tsaturation, double tbrightness, Board tb, double bt,
   double rot, double tvr, String tname,String tparents, boolean mutateName,
-  Axon[][][] tbrain, double[][] tneurons, int tgen, double tmouthHue){
+  Axon[][][] tbrain, double[][] tneurons, int tgen){
     super(tpx,tpy,tvx,tvy,tenergy,tdensity,thue, tsaturation, tbrightness,tb, bt);
     if(tbrain == null){
       axons = new Axon[brainWidth-1][brainHeight][brainHeight*brainWidth];
@@ -118,9 +117,8 @@ class Creature extends SoftBody{
     if(nLevel > boardHeight*(boardWidth-1))
       nLevel = boardHeight*(boardWidth-1);
     mLevel = gen/memoryGrowthRate;
-    if(mLevel > boardWidth)
-      mLevel = boardWidth;
-    mouthHue = tmouthHue;
+    if(mLevel+10 > boardWidth)
+      mLevel = boardWidth-10;
   }
   public void drawBrain(PFont font, float scaleUp){
     final float neuronSize = 0.15;
@@ -130,9 +128,9 @@ class Creature extends SoftBody{
     textFont(font,0.58*scaleUp);
     fill(0,0,1);
     String[] inputLabels = {"Hue","Sat","Bri","1Hue",
-    "1Sat","1Bri","2Hue","2Sat","2Bri","MHue","Mem"};
+    "1Sat","1Bri","2Hue","2Sat","2Bri","Temp.","Mem"};
     String[] outputLabels = {"Accel.","Turn","Eat","Fight","Birth","1",
-    "2","3","4","MHue","Mem"};
+    "2","3","4","5","Mem"};
     for(int y = 0; y < brainHeight; y++){
       if(y > 9){
         if(950 < 1096-bCameraX-0.25*scaleUp){
@@ -234,7 +232,7 @@ class Creature extends SoftBody{
     for(int i = 0; i < 9; i++){
       neurons[0][i] = visionResults[i];
     }
-    neurons[0][9] = mouthHue;
+    neurons[0][9] = getRandomCoveredTile().getTemp();
     for(int i = 0; i < memoryCount; i++){
       neurons[0][10+i] = sigmoid(memories[i]);
     }
@@ -282,7 +280,6 @@ class Creature extends SoftBody{
       if(neurons[end][5] > 0 && board.year-birthTime >= matureAge && energy > safeSize){
         reproduce(safeSize);
       }
-      mouthHue = Math.min(Math.max(neurons[end][9],0.05),0.4);
       for(int i = 0; i < memoryCount; i++){
         memories[i] = neurons[end][10+i];
       }
@@ -376,21 +373,21 @@ class Creature extends SoftBody{
       ellipseMode(RADIUS);
       ellipse((float)(px*scaleUp),(float)(py*scaleUp),
         (float)(board.minSurvivableSize*scaleUp),(float)(board.minSurvivableSize*scaleUp));
-      pushMatrix();
-      translate((float)(px*scaleUp),(float)(py*scaleUp));
-      scale((float)radius);
-      rotate((float)rotation);
-      strokeWeight((float)(board.creatureStrokeWeight/radius));
-      stroke(0,0,0);
-      fill((float)mouthHue,1.0,1.0);
-      ellipse(0.6*scaleUp,0,0.37*scaleUp,0.37*scaleUp);
+      //pushMatrix();
+      //translate((float)(px*scaleUp),(float)(py*scaleUp));
+      //scale((float)radius);
+      //rotate((float)rotation);
+      //strokeWeight((float)(board.creatureStrokeWeight/radius));
+      //stroke(0,0,0);
+      //fill((float)mouthHue,1.0,1.0);
+      //ellipse(0.6*scaleUp,0,0.37*scaleUp,0.37*scaleUp);
       /*rect(-0.7*scaleUp,-0.2*scaleUp,1.1*scaleUp,0.4*scaleUp);
       beginShape();
       vertex(0.3*scaleUp,-0.5*scaleUp);
       vertex(0.3*scaleUp,0.5*scaleUp);
       vertex(0.8*scaleUp,0.0*scaleUp);
       endShape(CLOSE);*/
-      popMatrix();
+      //popMatrix();
       if(showVision){
         fill(0,0,1);
         textFont(font,0.2*scaleUp);
@@ -438,8 +435,7 @@ class Creature extends SoftBody{
   }
   public void eat(double attemptedAmount, double timeStep){
     double amount = attemptedAmount/(1.0+(pow((float)distance(0,0,vx,vy),eatWhileMovingMultiplier)));
-    if(distance(0,0,vx,vy) > .005){}
-    else if(amount < 0){
+    if(amount < 0){
       dropEnergy(-amount*timeStep);
       loseEnergy(-attemptedAmount*eatEnergy*timeStep);
     }
@@ -450,14 +446,7 @@ class Creature extends SoftBody{
         foodToEat = coveredTile.foodLevel;
       }
       coveredTile.removeFood(foodToEat, true);
-      double foodDistance = Math.abs(coveredTile.foodType-mouthHue);
-      double multiplier = 1.0-foodDistance/foodSensitivity;
-      if(multiplier >= 0){
-        addEnergy(foodToEat*multiplier);
-      }
-      else{
-        loseEnergy(-foodToEat*multiplier);
-      }
+      addEnergy(foodToEat);
       loseEnergy(attemptedAmount*eatEnergy*timeStep);
     }
   }
@@ -621,7 +610,6 @@ class Creature extends SoftBody{
           double newHue = 0;
           double newSaturation = 0;
           double newBrightness = 0;
-          double newMouthHue = 0;
           int parentsTotal = parents.size();
           String[] parentNames = new String[parentsTotal];
           Axon[][][] newBrain = new Axon[brainWidth-1][brainHeight][brainHeight*brainWidth];
@@ -671,8 +659,8 @@ class Creature extends SoftBody{
           }
           if(gen%memoryGrowthRate == memoryGrowthRate-1){
             mLevel++;
-            if(mLevel > brainHeight)
-              mLevel = brainHeight;
+            if(mLevel+10 > brainHeight)
+              mLevel = brainHeight-10;
             int x = 0;
             int y = 9+mLevel;
             for(int z = 0; z < brainHeight+nLevel; z++){
@@ -706,7 +694,6 @@ class Creature extends SoftBody{
             newHue += parent.hue/parentsTotal;
             newSaturation += parent.saturation/parentsTotal;
             newBrightness += parent.brightness/parentsTotal;
-            newMouthHue += parent.mouthHue/parentsTotal;
             parentNames[i] = parent.name;
           }
           newHue = newHue + (double)random(-0.05,0.05);
@@ -715,7 +702,7 @@ class Creature extends SoftBody{
           board.creatures.add(new Creature(newPX,newPY,0,0,
             babySize,density,newHue,newSaturation,newBrightness,board,board.year,random(0,2*PI),0,
             stitchName(parentNames),andifyParents(parentNames),true,
-            newBrain,newNeurons,gen+1,newMouthHue));
+            newBrain,newNeurons,gen+1));
         }
       }
     }
@@ -867,9 +854,6 @@ class Creature extends SoftBody{
   }
   public void setHue(double set){
     hue = Math.min(Math.max(set,0),1);
-  }
-  public void setMouthHue(double set){
-    mouthHue = Math.min(Math.max(set,0),1);
   }
   public void setSaturarion(double set){
     saturation = Math.min(Math.max(set,0),1);

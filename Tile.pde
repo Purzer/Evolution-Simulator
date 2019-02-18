@@ -101,6 +101,9 @@ class Tile{
     }
     foodLevel -= amount;
   }
+  public double getTemp(){
+    return board.getGrowthRate(board.getSeason(),climateType);
+  }
   public color getColor(){
     iterate();
     color foodColor = color((float)(foodType),1,1);

@@ -313,7 +313,6 @@ class Board{
       text("Generation: "+selectedCreature.gen,10,445);
       text("Parents: "+selectedCreature.parents,10,465,210,255);
       text("Hue: "+nf((float)(selectedCreature.hue),0,2),10,500,210,255);
-      text("Mouth hue: "+nf((float)(selectedCreature.mouthHue),0,2),10,525,210,255);
       
       textAlign(CENTER);
       fill(buttonColor);
@@ -328,14 +327,8 @@ class Board{
       textAlign(LEFT);
       if(selectedCreature.userControl){
         text("Controls:\nUp/Down: Move\nLeft/Right: Rotate\nSpace: Eat\nF: Fight\nV: Vomit\nU,J: Change color"+
-        "\nI,K: Change mouth color\nB: Give birth (Not possible if under "+Math.round((manualBirthSize+1)*100)+" energy)",150,325,250,400);
+        "\nB: Give birth (Not possible if under "+Math.round((manualBirthSize+1)*100)+" energy)",150,325,250,400);
       }
-      //pushMatrix();
-      //fill(0,0,0.4);
-      //rect(265,65,215,370); 
-      //translate(330-bCameraX,80-bCameraY);
-      //selectedCreature.drawBrain(font,26*bZoom);
-      //popMatrix();
       
       selectedCreature.drawSizeGraph(x1,x2,y2);
       fill(0,0,1);
@@ -458,8 +451,6 @@ class Board{
               if(key == 'u') me.setHue(me.hue+0.02);
               if(key == 'j') me.setHue(me.hue-0.02);
               
-              if(key == 'i') me.setMouthHue(me.mouthHue+0.02);
-              if(key == 'k') me.setMouthHue(me.mouthHue-0.02);
               if(key == 'b'){
                 if(!wasPressingB){
                   me.reproduce(manualBirthSize);
@@ -599,7 +590,7 @@ class Board{
     while(creatures.size() < creatureMinimum){
       creatures.add(new Creature(random(0,boardWidth),random(0,boardHeight),0,0,
       random(minCreatureEnergy,maxCreatureEnergy),1,random(0,1),1,1,
-      this,year,random(0,2*PI),0,"","[PRIMORDIAL]",true,null,null,1,random(0,1)));
+      this,year,random(0,2*PI),0,"","[PRIMORDIAL]",true,null,null,1));
     }
   }
   private void maintainCreatureMaximum(){
